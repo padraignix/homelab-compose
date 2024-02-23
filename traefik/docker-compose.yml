@@ -36,6 +36,7 @@ services:
       - "traefik.http.routers.traefik-secure.service=api@internal"
     command:
       - --configFile=/traefik/config/traefik.yml
+      - --providers.file.filename=/traefix/config/config.yml
 
     logging:
       driver: "json-file"
