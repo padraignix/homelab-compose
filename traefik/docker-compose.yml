@@ -35,7 +35,7 @@ services:
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.docker.quantumlyconfused.com"
       - "traefik.http.routers.traefik-secure.service=api@internal"
     command:
-      - --configFile=/config/traefik.yml
+      - --configFile=/traefik/config/traefik.yml
 
     logging:
       driver: "json-file"
