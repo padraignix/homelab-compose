@@ -19,7 +19,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config.yml:/traefik2/config.yml
       - ./traefik-config:/traefik/config
       - ./traefik-data:/traefik/data
     labels:
