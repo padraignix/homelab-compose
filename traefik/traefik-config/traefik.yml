@@ -33,7 +33,7 @@ certificatesResolvers:
   cf:
     acme:
       email: padraignix@gmail.com
-      storage: /config/acme.json
+      storage: /data/acme.json
       dnsChallenge:
         provider: cloudflare
         delayBeforeCheck: 10

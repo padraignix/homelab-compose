@@ -19,9 +19,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /traefik-data/traefik.yml:/config/traefik.yml:ro
-      - /traefik-data/acme.json:/config/acme.json
-      - /traefik-data/config.yml:/config/config.yml
+      - /traefik-config:/config:ro
+      - /traefik-data:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
@@ -33,7 +32,7 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=cf"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=docker.quantumlyconfused.com"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.docker.quantumlyconfused.om"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.docker.quantumlyconfused.com"
       - "traefik.http.routers.traefik-secure.service=api@internal"
     command:
       - --configFile=/config/traefik.yml
