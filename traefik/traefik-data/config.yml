@@ -1,0 +1,6 @@
+http:
+  middlewares:
+    domain-redirect:
+      redirectRegex:
+        regex: "^http(s)?://([a-zA-Z0-9-_]+)(?:/|$)(.*)?"
+        replacement: "http${1}://${2}.docker.quantumlyconfused.com/${3}"

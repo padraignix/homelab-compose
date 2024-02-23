@@ -1,0 +1,47 @@
+version: "3.3"
+services:
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik"
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=America/Toronto
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_API_KEY=${CF_API_KEY}
+      - LEGO_EXPERIMENTAL_CNAME_SUPPORT=true
+    networks:
+      - media-net
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8888:8080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "./traefik-data/traefik.yml:/traefik.yml:ro"
+      - "./traefik-data/acme.json:/acme.json"
+      - "./traefik-data/config.yml:/config.yml"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.docker.quantumlyconfused.com`)"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.docker.quantumlyconfused.com`)"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cf"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=docker.quantumlyconfused.com"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.docker.quantumlyconfused.om"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "200k"
+    restart: unless-stopped
+
+networks:
+  media-net:
+    external: true
