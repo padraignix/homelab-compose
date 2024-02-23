@@ -11,7 +11,7 @@ services:
       - CF_API_KEY=${CF_API_KEY}
       - LEGO_EXPERIMENTAL_CNAME_SUPPORT=true
     networks:
-      - media-net
+      - full_network
     ports:
       - "80:80"
       - "443:443"
@@ -43,5 +43,5 @@ services:
     restart: unless-stopped
 
 networks:
-  media-net:
+  full_network:
     external: true
