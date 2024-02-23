@@ -28,12 +28,12 @@ providers:
     allowEmptyServices: true
     defaultRule:  "Host(`{{ index .Labels \"com.docker.compose.service\" }}`) || Host(`{{ index .Labels \"com.docker.compose.service\" }}.docker.quantumlyconfused.com`)"
   file:
-    filename: /config.yml
+    filename: /config/config.yml
 certificatesResolvers:
   cf:
     acme:
       email: padraignix@gmail.com
-      storage: acme.json
+      storage: /config/acme.json
       dnsChallenge:
         provider: cloudflare
         delayBeforeCheck: 10
