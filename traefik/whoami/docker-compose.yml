@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    networks:
+      - full_network
+    ports:
+      - "81:80"
+    #labels:
+    #  - "traefik.http.routers.whoami.rule=Host(`whoami.docker.quantumlyconfused.com`)"
+
+networks:
+  full_network:
+    external: true
