@@ -19,8 +19,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik-config:/traefik/config
-      - ./traefik-data:/traefik/data
+      - /home/padraignix/traefik/traefik.yml:/traefik.yml:ro
+      - /home/padraignix/traefik/config.yml:/config.yml:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
@@ -34,9 +34,6 @@ services:
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=docker.quantumlyconfused.com"
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.docker.quantumlyconfused.com"
       - "traefik.http.routers.traefik-secure.service=api@internal"
-    command:
-      - --configFile=/traefik/config/traefik.yml
-      - --providers.file.filename=/traefix/config/config.yml
 
     logging:
       driver: "json-file"

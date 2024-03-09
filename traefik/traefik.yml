@@ -19,6 +19,11 @@ entryPoints:
           - main: docker.quantumlyconfused.com
       middlewares:
         - domain-redirect@file
+middlewares:
+  domain-redirect:
+      redirectRegex:
+        regex: "^http(s)?://([a-zA-Z0-9-_]+)(?:/|$)(.*)?"
+        replacement: "http${1}://${2}.docker.quantumlyconfused.com/${3}"
 serversTransport:
   insecureSkipVerify: true
 providers:
@@ -28,12 +33,12 @@ providers:
     allowEmptyServices: true
     defaultRule:  "Host(`{{ index .Labels \"com.docker.compose.service\" }}`) || Host(`{{ index .Labels \"com.docker.compose.service\" }}.docker.quantumlyconfused.com`)"
   file:
-    filename: /traefik/config/config.yml
+    filename: /config.yml
 certificatesResolvers:
   cf:
     acme:
       email: padraignix@gmail.com
-      storage: /traefik/data/acme.json
+      storage: acme.json
       dnsChallenge:
         provider: cloudflare
         delayBeforeCheck: 10
