@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  postgres:
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: ${DB_PASS}
+      networks:
+        - local
+  keycloak:
+      image: quay.io/keycloak/keycloak:latest
+      environment:
+        KC_DB: postgres
+        KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?ssl=allow
+        #KC_DB_URL_HOST: postgres
+        #KC_DB_URL_DATABASE: keycloak
+        #KC_DB_URL_PORT: 5432
+        KC_DB_USER: keycloak
+        KC_DB_SCHEMA: public
+        KC_DB_PASSWORD: ${DB_PASS}
+        KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+        KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+        
+        KC_HOSTNAME_STRICT: false
+        KC_HOSTNAME_URL: https://${KEYCLOAK_DOMAIN}
+        KC_PROXY_ADDRESS_FORWARDING: true
+        #KC_PROXY: edge
+        KC_PROXY_HEADERS: xforwarded
+        KC_HTTP_ENABLED: true
+        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+        #JDBC_PARAMS: "ssl=true"
+      command: start
+      ports:
+        - 8080:8080
+      depends_on:
+        - postgres
+      networks:
+        - full_network
+        - local
+      #labels:
+      #  - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8080"
+      #  - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.scheme=https"
+
+volumes:
+  postgres_data:
+      driver: local
+
+networks:
+  local:
+    external: false
+  full_network:
+    external: true
+      

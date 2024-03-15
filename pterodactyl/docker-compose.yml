@@ -1,0 +1,91 @@
+version: '3.8'
+x-common:
+  database:
+    &db-environment
+    # Do not remove the "&db-password" from the end of the line below, it is important
+    # for Panel functionality.
+    MYSQL_PASSWORD: &db-password ${DB_PASS}
+    MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+  panel:
+    &panel-environment
+    APP_URL: "https://panel.docker.quantumlyconfused.com"
+    # A list of valid timezones can be found here: http://php.net/manual/en/timezones.php
+    APP_TIMEZONE: "UTC"
+    APP_SERVICE_AUTHOR: "admin@example.com"
+  mail:
+    &mail-environment
+    MAIL_FROM: "noreply@example.com"
+    MAIL_DRIVER: "smtp"
+    MAIL_HOST: "mail"
+    MAIL_PORT: "1025"
+    MAIL_USERNAME: ""
+    MAIL_PASSWORD: ""
+    MAIL_ENCRYPTION: "true"
+
+#
+# ------------------------------------------------------------------------------------------
+# DANGER ZONE BELOW
+#
+# The remainder of this file likely does not need to be changed. Please only make modifications
+# below if you understand what you are doing.
+#
+
+services:
+
+  database:
+    image: library/mysql:8.0
+    restart: always
+    networks:
+      - local
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "${DATA_DIR}/database:/var/lib/mysql"
+    environment:
+      <<: *db-environment
+      MYSQL_DATABASE: "panel"
+      MYSQL_USER: "pterodactyl"
+  cache:
+    image: redis:alpine
+    restart: always
+    networks:
+      - local
+  panel:
+    image: ghcr.io/pterodactyl/panel:latest
+    restart: always
+    networks:
+      - full_network
+      - local
+    ports:
+      - "85:80"
+      - "445:443"
+    links:
+      - database
+      - cache
+    volumes:
+      - "${DATA_DIR}/panel/var/:/app/var/"
+      - "${DATA_DIR}/panel/logs/:/app/storage/logs"
+      - "${DATA_DIR}/panel/nginx/:/etc/nginx/conf.d/"
+    environment:
+      <<: [*panel-environment, *mail-environment]
+      DB_PASSWORD: *db-password
+      APP_ENV: "production"
+      APP_ENVIRONMENT_ONLY: "false"
+      CACHE_DRIVER: "redis"
+      SESSION_DRIVER: "redis"
+      QUEUE_DRIVER: "redis"
+      REDIS_HOST: "cache"
+      DB_HOST: "database"
+      TRUSTED_PROXIES: "*"
+    #labels:
+    #  - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=443"
+    #  - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.scheme=https"
+
+networks:
+  local:
+    external: false
+  full_network:
+    external: true
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
